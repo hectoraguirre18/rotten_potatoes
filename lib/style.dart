@@ -6,6 +6,7 @@ class Style {
 
   ThemeData get appTheme => ThemeData(
     primarySwatch: Colors.cyan,
+    fontFamily: 'ProximaNova',
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 }
