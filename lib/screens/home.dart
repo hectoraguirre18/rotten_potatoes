@@ -68,9 +68,6 @@ class _HomePageState extends State<HomePage>{
   );
 
   void onClickAccount() {
-
-    final formKey = GlobalKey<FormState>();
-
     Widget cancelButton = FlatButton(
       child: Text('Cancel'),
       onPressed:  () => Navigator.pop(context),
