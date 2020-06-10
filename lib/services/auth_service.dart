@@ -24,6 +24,8 @@ class AuthService {
 
   Future<User> getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(!prefs.containsKey('userId'))
+      return null;
     return User(
       id: prefs.getInt('userId'),
       name: prefs.getString('userName'),
