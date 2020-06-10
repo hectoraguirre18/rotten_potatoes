@@ -10,10 +10,10 @@ class ShowDetailsScreen extends StatefulWidget {
   ShowDetailsScreen(this.show) : assert(show != null);
 
   @override
-  State<StatefulWidget> createState() => _ShowDetailsScreennState();
+  State<StatefulWidget> createState() => _ShowDetailsScreenState();
 }
 
-class _ShowDetailsScreennState extends State<ShowDetailsScreen> {
+class _ShowDetailsScreenState extends State<ShowDetailsScreen> {
 
   List<Review> reviews;
 
@@ -28,60 +28,102 @@ class _ShowDetailsScreennState extends State<ShowDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: header(),
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            header(),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height *0.25,
-              ),
+            Expanded(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        widget.show.description ?? 'No description',
-                        textAlign: TextAlign.justify,
+                child: Column(
+                  children: <Widget>[
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: MediaQuery.of(context).size.height *0.25,
                       ),
-                    ],
-                  ),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                widget.show.description ?? 'No description',
+                                textAlign: TextAlign.justify,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      indent: 8,
+                      endIndent: 8,
+                      thickness: 2,
+                      height: 32,
+                    ),
+                    Text(
+                      'Reviews',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    reviews?.isNotEmpty ?? false
+                      ? reviewList()
+                      : Padding(
+                        padding: const EdgeInsets.only(top: 64),
+                        child: Text(
+                          'This show doesn\'t have reviews yet.'
+                        ),
+                      ),
+                    SizedBox(height: 12)
+                  ],
                 ),
               ),
             ),
-            Divider(
-              indent: 8,
-              endIndent: 8,
-              thickness: 2,
-              height: 32,
-            ),
-
-            Text(
-              'Reviews',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-              ),
-            ),
-            reviews?.isNotEmpty ?? false
-              ? Expanded(child: reviewList())
-              : Expanded(
-                child: Center(
-                  child: Text(
-                    'This show doesn\'t have reviews yet.'
-                  ),
-                )
-              )
+            commentBar(),
           ],
         ),
       ),
     );
   }
+
+  Widget commentBar() => Container(
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: Colors.grey[50],
+      boxShadow: [
+        BoxShadow(
+          blurRadius: 4
+        )
+      ]
+    ),
+    child: Row(
+      children: <Widget>[
+        Expanded(
+          child: TextField(
+            decoration: InputDecoration(
+              labelText: 'Add a comment',
+              contentPadding: const EdgeInsets.all(0)
+            ),
+          ),
+        ),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            child: Icon(Icons.send),
+            onTap: (){
+              print('ADD COMMENT');
+            },
+          ),
+        )
+      ],
+    ),
+  );
   
   Widget header() => PreferredSize(
     child: Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.fromLTRB(8, 32, 8, 8),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,6 +157,8 @@ class _ShowDetailsScreennState extends State<ShowDetailsScreen> {
   Widget reviewList() => ListView.builder(
     itemBuilder: (context, index) => reviewItemList(reviews.elementAt(index)),
     itemCount: reviews.length,
+    shrinkWrap: true,
+    physics: NeverScrollableScrollPhysics(),
   );
 
   Widget reviewItemList(Review review) => Padding(
