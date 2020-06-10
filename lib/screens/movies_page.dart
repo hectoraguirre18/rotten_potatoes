@@ -26,6 +26,7 @@ class _MoviesPageState extends State<MoviesPage> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),

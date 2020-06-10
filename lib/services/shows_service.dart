@@ -9,26 +9,35 @@ class ShowsService {
 
   ShowsService._();
   static ShowsService _instance;
-  static get instance {
+  static ShowsService get instance {
     if(_instance == null)
       _instance = ShowsService._();
     return _instance;
   }
 
   Future<List<Show>> getShows() async {
+    try {
     final response = await http.get('$_baseUrl/shows');
     List shows = jsonDecode(response.body);
     return shows.map<Show>((map) => Show.fromMap(map)).toList();
+    } catch (e) {
+      print('[ShowsService][getShows] $e');
+      return <Show>[];
+    }
   }
 
   Future<void> saveShow(Show show) async {
-    final response = await http.post(
-      '$_baseUrl/shows',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: jsonEncode(show.toMap())
-    );
-    print(response);
+    try {
+      final response = await http.post(
+        '$_baseUrl/shows',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(show.toMap())
+      );
+      print(response);
+    } catch (e) {
+      print('[ShowsService][saveShow] $e');
+    }
   }
 }

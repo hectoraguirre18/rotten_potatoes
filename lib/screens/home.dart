@@ -67,7 +67,43 @@ class _HomePageState extends State<HomePage>{
     preferredSize: Size.fromHeight(kToolbarHeight)
   );
 
-  void onClickAccount() {
+  void onClickAccount() async {
+    if(await AuthService.instance.isLoggedIn())
+      showSignedInAlert();
+    else
+      showNotSignedInAlert();
+  }
+
+  void showSignedInAlert() async {
+    Widget cancelButton = FlatButton(
+      child: Text('Ok'),
+      onPressed:  () => Navigator.pop(context),
+    );
+    Widget signOutButton = FlatButton(
+      child: Text('Sign Out'),
+      onPressed:  () async {
+        await AuthService.instance.signOut();
+        Navigator.pop(context);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text('Signed in as ${(await AuthService.instance.getUser()).name}'),
+      actions: [
+        cancelButton,
+        signOutButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void showNotSignedInAlert() {
     Widget cancelButton = FlatButton(
       child: Text('Cancel'),
       onPressed:  () => Navigator.pop(context),

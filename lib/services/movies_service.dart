@@ -9,26 +9,35 @@ class MoviesService {
 
   MoviesService._();
   static MoviesService _instance;
-  static get instance {
+  static MoviesService get instance {
     if(_instance == null)
       _instance = MoviesService._();
     return _instance;
   }
 
   Future<List<Movie>> getMovies() async {
-    final response = await http.get('$_baseUrl/movies');
-    List movies = jsonDecode(response.body);
-    return movies.map<Movie>((map) => Movie.fromMap(map)).toList();
+    try {
+      final response = await http.get('$_baseUrl/movies');
+      List movies = jsonDecode(response.body);
+      return movies.map<Movie>((map) => Movie.fromMap(map)).toList();
+    } catch (e) {
+      print('[MoviesService][getMovies] $e');
+      return <Movie>[];
+    }
   }
 
   Future<void> saveMovie(Movie movie) async {
-    final response = await http.post(
-      '$_baseUrl/movies',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: jsonEncode(movie.toMap())
-    );
-    print(response);
+    try {
+      final response = await http.post(
+        '$_baseUrl/movies',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode(movie.toMap())
+      );
+      print(response);
+    } catch (e) {
+      print('[MoviesService][getMovies] $e');
+    }
   }
 }
