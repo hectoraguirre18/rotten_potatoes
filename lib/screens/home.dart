@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rotten_potatoes/screens/movies_page.dart';
 import 'package:rotten_potatoes/screens/shows_page.dart';
+import 'package:rotten_potatoes/services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,11 +21,9 @@ class _HomePageState extends State<HomePage>{
               TabBar(
                 tabs: <Widget>[
                   Tab(
-                    // icon: Icon(Icons.movie),
                     text: 'Movies',
                   ),
                   Tab(
-                    // icon: Icon(Icons.tv),
                     text: 'Tv Shows',
                   ),
                 ],
@@ -51,19 +50,64 @@ class _HomePageState extends State<HomePage>{
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Icon(
-            Icons.menu
-          ),
+          SizedBox(width: 24),
           Image.asset(
             'assets/images/logo.png',
             height: kToolbarHeight*0.8,
           ),
-          Icon(
-            Icons.search
+          InkWell(
+            child: Icon(
+              Icons.account_circle
+            ),
+            onTap: onClickAccount,
           ),
         ],
       ),
     ),
     preferredSize: Size.fromHeight(kToolbarHeight)
   );
+
+  void onClickAccount() {
+
+    final formKey = GlobalKey<FormState>();
+
+    Widget cancelButton = FlatButton(
+      child: Text('Cancel'),
+      onPressed:  () => Navigator.pop(context),
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text('You\'re not signed in :('),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          RaisedButton(
+            child: Text('SIGN IN'),
+            onPressed: (){
+              Navigator.pop(context);
+              AuthService.instance.openSignInDialog(context);
+            }
+          ),
+          RaisedButton(
+            child: Text('CREATE ACCOUNT'),
+            onPressed: (){
+              Navigator.pop(context);
+              AuthService.instance.openSignUpDialog(context);
+            }
+          ),
+        ],
+      ),
+      actions: [
+        cancelButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 }
