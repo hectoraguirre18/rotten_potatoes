@@ -2,13 +2,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:rotten_potatoes/model/show.dart';
 import 'package:rotten_potatoes/screens/show_details.dart';
+import 'package:rotten_potatoes/services/shows_service.dart';
 
 class ShowsPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _ShowsPageState();
 }
 
-class _ShowsPageState extends State<ShowsPage> {
+class _ShowsPageState extends State<ShowsPage> with AutomaticKeepAliveClientMixin {
 
   List<Show> shows;
 
@@ -18,15 +19,9 @@ class _ShowsPageState extends State<ShowsPage> {
     readShows();
   }
 
-  void readShows() async {
-    setState(() {
-      shows = [];
-      shows.add(Show(name: 'Stranger Things'));
-      shows.add(Show(name: 'The Office'));
-      shows.add(Show(name: 'How I Met Your Mother'));
-      shows.add(Show(name: 'Friends'));
-      shows.add(Show(name: 'That \'70s Show'));
-    });
+  Future<void> readShows() async {
+    final shows = await ShowsService.instance.getShows();
+    setState(() => this.shows = shows);
   }
 
   @override
@@ -34,7 +29,10 @@ class _ShowsPageState extends State<ShowsPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: showList(),
+        child: RefreshIndicator(
+          onRefresh: readShows,
+          child: showList()
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
@@ -95,7 +93,7 @@ class _ShowsPageState extends State<ShowsPage> {
                   labelText: 'Description',
                 ),
                 validator: (value) {
-                  if(value.isEmpty)
+                  if(value.isNotEmpty)
                     show.description = value;
                   return null;
                 }
@@ -104,9 +102,11 @@ class _ShowsPageState extends State<ShowsPage> {
                 padding: const EdgeInsets.only(top: 24.0),
                 child: RaisedButton(
                   child: Text('ADD SHOW'),
-                  onPressed: () {
+                  onPressed: () async {
                     if(formKey.currentState.validate()) {
-                      print('ADD SHOW');
+                      await ShowsService.instance.saveShow(show);
+                      Navigator.pop(context);
+                      await readShows();
                     }
                   },
                 ),
@@ -127,4 +127,7 @@ class _ShowsPageState extends State<ShowsPage> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
