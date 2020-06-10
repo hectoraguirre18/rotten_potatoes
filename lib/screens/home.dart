@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage>{
 
   Widget movieList() => ListView.separated(
     itemBuilder: (context, index) => ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+      leading: Icon(Icons.movie),
       title: AutoSizeText(
         movies.elementAt(index).name,
         maxLines: 1,
