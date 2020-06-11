@@ -36,6 +36,7 @@ class _ShowsPageState extends State<ShowsPage> with AutomaticKeepAliveClientMixi
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'showsActionButton',
         child: Icon(Icons.add),
         onPressed: () => openDialog(context),
       ),

@@ -36,6 +36,7 @@ class _MoviesPageState extends State<MoviesPage> with AutomaticKeepAliveClientMi
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'moviesActionButton',
         child: Icon(Icons.add),
         onPressed: () => openDialog(context),
       ),

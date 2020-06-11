@@ -179,7 +179,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                 child: InkWell(
                   child: Icon(Icons.send),
                   onTap: () async {
-                    // print('[${controller.value.text}]');
+                    print('parent review: ${parentReview}');
                     if(controller.value.text.isEmpty)
                       return;
                     final review = MovieReview(
