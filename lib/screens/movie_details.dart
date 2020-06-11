@@ -1,9 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:rotten_potatoes/model/movie.dart';
-import 'package:rotten_potatoes/model/review.dart';
+import 'package:rotten_potatoes/model/movie_review.dart';
 import 'package:rotten_potatoes/model/user.dart';
 import 'package:rotten_potatoes/services/auth_service.dart';
+import 'package:rotten_potatoes/services/reviews_service.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
 
@@ -18,8 +19,8 @@ class MovieDetailsScreen extends StatefulWidget {
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
 
   User user;
-  List<Review> reviews;
-  Review parentReview;
+  List<MovieReview> reviews = [];
+  MovieReview parentReview;
   final controller = TextEditingController();
 
   @override
@@ -29,8 +30,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       setState(() => user = u);
       print(u);
     });
-    setState(() {
-      reviews = randomComments();
+    ReviewsService.instance.getReviewsForMovie(widget.movie.id).then((result){
+      setState(() => reviews = result);
     });
   }
 
@@ -134,7 +135,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Responding to ${parentReview.username}\'s comment: ${parentReview.content}',
+                        'Responding to ${parentReview.userName}\'s comment: ${parentReview.content}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -177,13 +178,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   child: Icon(Icons.send),
-                  onTap: (){
-                    final review = Review(
-                      id: DateTime.now().toString(),
+                  onTap: () async {
+                    // print('[${controller.value.text}]');
+                    if(controller.value.text.isEmpty)
+                      return;
+                    final review = MovieReview(
                       content: controller.value.text,
-                      userId: user.id.toString(),
-                      username: user.name,
-                      comments: [],
+                      movieId: widget.movie.id,
+                      userId: user.id,
+                      userName: user.name,
+                      parentMovieReview: parentReview?.id,
                     );
                     setState((){
                       if(parentReview != null) {
@@ -195,6 +199,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         reviews.add(review);
                       }
                     });
+                    await ReviewsService.instance.saveMovieReview(review);
                     controller.clear();
                   },
                 ),
@@ -247,7 +252,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     physics: NeverScrollableScrollPhysics(),
   );
 
-  Widget reviewItemList(Review review) => Padding(
+  Widget reviewItemList(MovieReview review) => Padding(
     padding: const EdgeInsets.fromLTRB(4, 8, 4, 0),
     child: IntrinsicHeight(
       child: Row(
@@ -274,7 +279,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     children: [
                       SizedBox(width: double.infinity),
                       Text(
-                        review.username,
+                        review.userName,
                         style: TextStyle(
                           fontSize: 10
                         ),
